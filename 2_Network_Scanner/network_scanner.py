@@ -1,6 +1,20 @@
 #!/usr/bin/env python
 
 import scapy.all as scapy
+import optparse
+
+#import argparse # incase of the replacement of optparse is to be used
+# parser = argparse.ArgumentParser()
+# parser.add_argument(....)
+# options = parse.parse_args()
+
+def get_arguments():
+    parser = optparse.OptionParser()
+    parser.add_option("-t", "--target", dest="target", help="IP or IP range for which ARP has to be resolved")
+    (options, arguments) = parser.parse_args()
+    if not options.target:
+        parser.error("[-] Please specify an ip or ip range; use --help for more info")
+    return options
 
 def scan(ip):
     #scapy.arping(ip)
@@ -22,9 +36,10 @@ def scan(ip):
 
 
 def print_result(results_list):
-    print("IP\t\t\t\tMAC Address\n-------------------------------------------------")
+    print("IP\t\t\tMAC Address\n-------------------------------------------------")
     for client in results_list:
-        print(client)
+        #print(client)
+        print(client["ip"] + "\t\t" + client["mac"])
     print("-------------------------------------------------")
     
 
@@ -45,5 +60,9 @@ def print_result(results_list):
 
 # use route -n command in linux to find the gateway IP
 #scan("10.0.2.2")
-scan_result = scan("10.0.2.2/24")
+
+options = get_arguments()
+
+#scan_result = scan("10.0.2.2/24")
+scan_result = scan(options.target)
 print_result(scan_result)
