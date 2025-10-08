@@ -6,16 +6,27 @@ def scan(ip):
     #scapy.arping(ip)
     arp_request = scapy.ARP(pdst=ip)
     #arp_request.pdst = ip
-    broadcast = scapy.Ether()
-    #broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff") # this step is not required as dst is of type broadcast by default
+    #broadcast = scapy.Ether()
+    broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
 
     arp_request_broadcast = broadcast/arp_request
-    answered_list = scapy.srp(arp_request_broadcast, timeout=1)[0]
+    answered_list = scapy.srp(arp_request_broadcast, timeout=1, verbose = False)[0]
+
+    clients_list = []
 
     for element in answered_list:
-        print(element[1].psrc)
-        print(element[1].hwsrc)
-        print("------------------------------------------------------------------")
+        client_dict = {"ip":element[1].psrc, "mac":element[1].hwsrc}
+        #print(element[1].psrc + "\t\t" + element[1].hwsrc)
+        clients_list.append(client_dict)
+    return clients_list
+
+
+def print_result(results_list):
+    print("IP\t\t\t\tMAC Address\n-------------------------------------------------")
+    for client in results_list:
+        print(client)
+    print("-------------------------------------------------")
+    
 
     #print(arp_request.summary())
     #scapy.ls(scapy.ARP()) # This is used to list the supported parameters of ARP()
@@ -34,4 +45,5 @@ def scan(ip):
 
 # use route -n command in linux to find the gateway IP
 #scan("10.0.2.2")
-scan("10.0.2.2/28")
+scan_result = scan("10.0.2.2/24")
+print_result(scan_result)
