@@ -7,6 +7,9 @@ import optparse
 # parser = argparse.ArgumentParser()
 # parser.add_argument(....)
 # options = parse.parse_args()
+# Tips:
+# use route -n command in linux to find the gateway IP
+# use arp -a command in windows to find the arp table
 
 def get_arguments():
     parser = optparse.OptionParser()
@@ -20,7 +23,8 @@ def scan(ip):
     #scapy.arping(ip)
     arp_request = scapy.ARP(pdst=ip)
     #arp_request.pdst = ip
-    #broadcast = scapy.Ether()
+    # it will work without the dst="...", but will warn for every data sent out that dst is not configured and defaulting to broadcast Id
+    #broadcast = scapy.Ether() 
     broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
 
     arp_request_broadcast = broadcast/arp_request
@@ -58,7 +62,6 @@ def print_result(results_list):
     #print(unanswered_list.summary())
 
 
-# use route -n command in linux to find the gateway IP
 #scan("10.0.2.2")
 
 options = get_arguments()
