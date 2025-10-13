@@ -33,3 +33,6 @@ def process_sniffed_packet(packet):
 
 
 sniff("enp0s3")
+
+#ref: pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org NetFilterQueue
+#ref: https://gitlab.com/kalilinux/packages/python-netfilterqueue/tree/kali/master
