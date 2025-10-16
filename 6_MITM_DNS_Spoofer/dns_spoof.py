@@ -28,7 +28,7 @@ def process_packet(packet):
             del scapy_packet[scapy.IP].len
             del scapy_packet[scapy.UDP].len
 
-            packet.set_payload(str(scapy_packet))  # convert back to netfilterqueue format
+            packet.set_payload(str(scapy_packet))  # convert back to netfilterqueue format and send the packet
 
         #print(scapy_packet.show())   # this line can be only used for scapy formatted data
     #print(packet)               # this line can be used to print the type of pkt and size

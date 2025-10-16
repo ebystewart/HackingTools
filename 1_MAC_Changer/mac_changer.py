@@ -26,6 +26,7 @@ def change_mac(interface, new_mac):
     subprocess.call(["ifconfig", interface, "up"])
 
 def get_current_mac(interface):
+    # execute the command using check_output() API. This is alternative to call, but calpures and resturns the result of the command
     ifconfig_result = subprocess.check_output(["ifconfig", interface])
     #print(ifconfig_result)
     mac_address_search_result = re.search(r"\w\w:\w\w:\w\w:\w\w:\w\w:\w\w", str(ifconfig_result))
