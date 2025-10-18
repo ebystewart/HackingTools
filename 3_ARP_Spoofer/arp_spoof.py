@@ -31,8 +31,8 @@ def restore(destination_ip, source_ip):
     #print(packet.show())
     #print(packet.summary())
 
-target_ip = "192.168.43.42"
-gateway_ip ="192.168.43.1"
+target_ip = "192.168.1.14"  # need to update for every attack
+gateway_ip ="192.168.1.1"   # need to upadte every time. command "arp -a" can help find the gaetway
 
 try:
     sent_packet_count = 0

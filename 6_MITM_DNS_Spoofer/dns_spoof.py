@@ -10,7 +10,7 @@
 import scapy.all as scapy
 import netfilterqueue
 
-web_server = "192.168.0.40"
+web_server = "192.168.1.15"  # self IP
 
 def process_packet(packet):
     print("[+] Filtered packet is queued in nfq 0\n")

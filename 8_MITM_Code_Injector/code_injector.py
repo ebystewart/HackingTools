@@ -17,6 +17,7 @@ def set_load(packet, load):
     del packet[scapy.IP].chksum
     del packet[scapy.TCP].chksum
     del packet[scapy.IP].len
+    return packet
 
 def process_packet(packet):
     scapy_packet = scapy.IP(packet.get_payload())  # convert to scapy format
