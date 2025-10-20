@@ -7,6 +7,7 @@ from scapy.layers import http
 # iptables -I FORWARD -j NFQUEUE --queue-num 0
 
 def sniff(interface):
+    # scapy.sniff() is blocking function
     scapy.sniff(iface=interface, store=False, prn=process_sniffed_packet) # prn is the callback function
 
 def get_url(packet):

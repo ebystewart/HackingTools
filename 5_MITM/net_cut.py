@@ -3,6 +3,7 @@
 #command 1: sudo iptables -I FORWARD -j NFQUEUE --queue-num 0
 #           sudo iptables -I INPUT -j NFQUEUE --queue-num 0
 #           sudo iptables -I OUTPUT -j NFQUEUE --queue-num 0
+#           sudo bettercap -iface enp0s3 -caplet hstshijack/hstshijack
 #command 2: sudo iptables --flush
 
 # This application is written to test Man-in-the-Middle attack along with arp_spoof.py
