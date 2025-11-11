@@ -41,9 +41,11 @@ class Listener:
                 continue
 
     def execute_remote_command(self, command):
-        #self.connection.send(command.encode())
         self.reliable_send(command)
-        #return self.connection.recv(1024)
+
+        if command[0] == "exit":
+            self.connection.close()
+            exit()
         return self.reliable_receive()
 
     def run(self):
@@ -52,11 +54,11 @@ class Listener:
         while True:
             try:
                 command = input(">> ")
+                command = command.split(" ")
                 result = self.execute_remote_command(command)
                 print(result)
 
             except json.JSONDecodeError:
-                #print(receive_command)
                 pass
 
             except KeyboardInterrupt:
