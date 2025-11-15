@@ -1,0 +1,10 @@
+http://192.168.1.9/mutillidae
+http://192.168.1.9/mutillidae?page=add-to-your-blog.php
+http://192.168.1.9/mutillidae?page=view-someones-blog.php
+http://192.168.1.9/mutillidae?page=show-log.php
+http://192.168.1.9/mutillidae?page=text-file-viewer.php
+http://192.168.1.9/mutillidae?page=user-info.php
+http://192.168.1.9/mutillidae?page=login.php
+http://192.168.1.9/mutillidae?page=credits.php
+http://192.168.1.9/mutillidae?page=source-viewer.php
+http://192.168.1.9/mutillidae/documentation/mutillidae-installation-on-xampp-win7.pdf
