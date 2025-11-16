@@ -3,11 +3,11 @@ import re
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 
-target_url = "http://192.168.1.9/mutillidae"
+target_url = "http://192.168.1.9/mutillidae/"
 target_links = []
 
 def extract_links_from(url):
-    response = requests.get(target_url)
+    response = requests.get(url)
     #print(response.content)
     return re.findall('(?:href=")(.*?)"', response.content.decode(errors="ignore"))
 
